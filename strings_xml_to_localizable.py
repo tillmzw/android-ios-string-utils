@@ -2,15 +2,33 @@ import sys
 import re
 
 def transform_android_string(android_string):
-	transformed = re.sub(r'(?:<string name=\"|<string name = \")', '\"', android_string) #convert string tags
+	# convert string tags
+	transformed = re.sub(r'(?:<string name=\"|<string name = \")', '\"', android_string)
 	transformed = re.sub(r'\">', '\" = ', transformed)
 	transformed = re.sub(r'</string>', ';', transformed)
-	transformed = re.sub(r'<!--', '/*', transformed) #convert xml comments
+	
+	# remove empty elements (<string name="asdasd" />)
+	transformed = re.sub(r'(:?"\w+"\/>)', '', transformed)
+	# convert xml comments
+	transformed = re.sub(r'<!--', '/*', transformed)
 	transformed = re.sub(r'-->', '*/', transformed)
-	transformed = re.sub(r'<resources>', '', transformed) #strip resource tags
+	
+	# strip xml tags
+	transformed = re.sub(r'<\?xml version="1.0" encoding="utf-8"\?>', '', transformed)	
+	# strip resource tags
+	transformed = re.sub(r'<resources>', '', transformed)
 	transformed = re.sub(r'</resources>', '', transformed)
+	
+	# transform string placeholder
+	transformed = re.sub(r'%1\$s', '%@', transformed)
+	
+	# remove leading line breaks
+	transformed = re.sub(r'^\s+', '', transformed)
+	#remove leading spaces on every line, we no nest here!
+	transformed = re.sub(r'(?:\t+|\ {4})', '', transformed)
+	
 	#todo: universal conversion of all entities
-	transformed = re.sub(r'&#8230;', '\\U2026', transformed) #convert xml entity ellipse to unicode
+	#transformed = re.sub(r'&#8230;', '\\U2026', transformed) #convert xml entity ellipse to unicode
 	return transformed
 
 def convert_android_to_ios(input_file_name, output_file_name):
@@ -60,7 +78,7 @@ def main(argv):
 		print 'Converts an Android strings.xml to an iOS Localizable.strings'
 		print 'Assumes a well formed strings.xml with quotes around each string value. Run clean_android_strings.py first, to ensure.'
 		print 'Usage: <input.xml> <output.strings>'
-		print '   or'
+		print '	  or'
 		print 'Usage: -test (run all tests)'		
 		sys.exit(2)
 	convert_android_to_ios(argv[0], argv[1])
