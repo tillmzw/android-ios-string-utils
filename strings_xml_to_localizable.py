@@ -2,8 +2,10 @@ import sys
 import re
 
 def transform_android_string(android_string):
+	# remove XML version tag
+	transformed = re.sub(r'<\?xml version="1.0" encoding="UTF-8"\?>', '', android_string)
 	# convert string tags
-	transformed = re.sub(r'(?:<string name=\"|<string name = \")', '\"', android_string)
+	transformed = re.sub(r'(?:<string name=\"|<string name = \")', '\"', transformed)
 	transformed = re.sub(r'\">', '\" = ', transformed)
 	transformed = re.sub(r'</string>', ';', transformed)
 	
@@ -13,6 +15,8 @@ def transform_android_string(android_string):
 	transformed = re.sub(r'<!--', '/*', transformed)
 	transformed = re.sub(r'-->', '*/', transformed)
 	
+	# remove \ before ' (escaping)
+	transformed = re.sub(r'(\\)\'', '\'', transformed)
 	# strip xml tags
 	transformed = re.sub(r'<\?xml version="1.0" encoding="utf-8"\?>', '', transformed)	
 	# strip resource tags
