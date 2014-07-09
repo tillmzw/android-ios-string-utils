@@ -22,6 +22,9 @@ def transform_android_string(android_string):
 	# strip resource tags
 	transformed = re.sub(r'<resources>', '', transformed)
 	transformed = re.sub(r'</resources>', '', transformed)
+
+	# strip translatable= tags
+        transformed = re.sub(r'\s+(?:translatable\s?=\")\s?(?:false|true)\s?\"', '', transformed)
 	
 	# transform string placeholder
 	transformed = re.sub(r'%1\$s', '%@', transformed)
