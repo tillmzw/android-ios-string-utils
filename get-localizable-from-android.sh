@@ -30,6 +30,10 @@ function android_to_ios {
                 if [ -d $dest ]; then
                         echo -e "Running \n python $TOOL $src $dest/Localizable.strings" 
                         python $TOOL $src $dest/Localizable.strings
+                        if [ $? -gt 0 ]; then
+                            echo "Previous command encountered an error. Exiting."
+                            exit 3
+                        fi
                 else
                         echo "destination $dest doesn't exist"
                         exit 2
